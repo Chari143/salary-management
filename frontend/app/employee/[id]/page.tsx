@@ -1,7 +1,7 @@
 import { getEmployee, getEmployeeSalaries } from "@/lib/api";
 import Link from "next/link";
 import { ArrowLeft, History, Plus } from "lucide-react";
-
+import { AddSalaryForm } from "@/components/AddSalaryForm";
 export default async function EmployeeDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
@@ -36,10 +36,7 @@ export default async function EmployeeDetailsPage({ params }: { params: Promise<
                             <h2 className="text-xl font-bold text-slate-800">Salary History</h2>
                         </div>
 
-                        <button className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition-colors">
-                            <Plus className="w-4 h-4" />
-                            Update Salary
-                        </button>
+                        <AddSalaryForm employeeId={id} />
                     </div>
 
                     <table className="w-full text-left">
