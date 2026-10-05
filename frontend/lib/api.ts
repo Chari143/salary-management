@@ -15,10 +15,41 @@ export interface Employee {
     hire_date: string;
 }
 
+export interface Salary {
+    id: string;
+    employee_id: string;
+    amount: number;
+    currency: string;
+    effective_date: string;
+    created_at: string;
+}
+
+
 export async function getEmployees(skip = 0, limit = 100): Promise<Employee[]> {
     const res = await fetch(`${API_BASE_URL}/employees?skip=${skip}&limit=${limit}`, {
         cache: "no-store",
     });
     if (!res.ok) throw new Error("Failed to fetch employees");
+    return res.json();
+}
+
+
+export async function getEmployee(employeeId: string): Promise<Employee> {
+    const res = await fetch(`${API_BASE_URL}/employees/${employeeId}`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch employee");
+    return res.json();
+}
+export async function getEmployeeSalaries(employeeId: string): Promise<Salary[]> {
+    const res = await fetch(`${API_BASE_URL}/salaries/employee/${employeeId}`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch salaries");
+    return res.json();
+}
+export async function addSalary(data: { employee_id: string; amount: number; currency: string; effective_date: string }) {
+    const res = await fetch(`${API_BASE_URL}/salaries`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("Failed to add salary");
     return res.json();
 }
