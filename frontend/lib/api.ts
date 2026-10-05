@@ -25,10 +25,15 @@ export interface Salary {
 }
 
 
-export async function getEmployees(skip = 0, limit = 100): Promise<Employee[]> {
-    const res = await fetch(`${API_BASE_URL}/employees?skip=${skip}&limit=${limit}`, {
-        cache: "no-store",
-    });
+export async function getEmployees(skip = 0, limit = 100, search = "", department_id = ""): Promise<Employee[]> {
+    let url = `${API_BASE_URL}/employees?skip=${skip}&limit=${limit}`;
+    if (search) {
+        url += `&search=${encodeURIComponent(search)}`;
+    }
+    if (department_id) {
+        url += `&department_id=${encodeURIComponent(department_id)}`;
+    }
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch employees");
     return res.json();
 }

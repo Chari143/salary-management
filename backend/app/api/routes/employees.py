@@ -12,10 +12,12 @@ router = APIRouter(prefix="/employees", tags=["Employees"])
 def get_employees(
     skip: int = Query(0, ge=0, description="Skip the first N records"),
     limit: int = Query(100, ge=1, le=1000, description="Limit the number of records returned"),
+    search: str = Query(None, description="Search term for name, email or ID"),
+    department_id: str = Query(None, description="Filter by department ID"),
     db: Session = Depends(get_db)
 ):
     repo = EmployeeRepository(db)
-    return repo.get_all(skip=skip, limit=limit)
+    return repo.get_all(skip=skip, limit=limit, search=search, department_id=department_id)
 
 @router.post("", response_model=EmployeeResponse, status_code=status.HTTP_201_CREATED)
 def create_employee(

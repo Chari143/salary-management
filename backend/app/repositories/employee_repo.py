@@ -16,8 +16,22 @@ class EmployeeRepository:
     def get_by_id(self, employee_id: str) -> Optional[Employee]:
         return self.session.query(Employee).filter(Employee.id == employee_id).first()
 
-    def get_all(self, skip: int = 0, limit: int = 100) -> list[Employee]:
-        return self.session.query(Employee).order_by(Employee.created_at.desc()).offset(skip).limit(limit).all()
+    def get_all(self, skip: int = 0, limit: int = 100, search: str = None, department_id: str = None) -> list[Employee]:
+        query = self.session.query(Employee).filter(Employee.status == EmployeeStatus.ACTIVE.value)
+        
+        if department_id:
+            query = query.filter(Employee.department_id == department_id)
+            
+        if search:
+            search_term = f"%{search}%"
+            query = query.filter(
+                (Employee.first_name.ilike(search_term)) |
+                (Employee.last_name.ilike(search_term)) |
+                ((Employee.first_name + " " + Employee.last_name).ilike(search_term)) |
+                (Employee.email.ilike(search_term)) |
+                (Employee.employee_number.ilike(search_term))
+            )
+        return query.order_by(Employee.created_at.desc()).offset(skip).limit(limit).all()
 
     def generate_employee_number(self) -> str:
         last_emp = self.session.query(Employee).order_by(Employee.employee_number.desc()).first()
