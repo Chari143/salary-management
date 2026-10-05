@@ -11,12 +11,17 @@ import { format } from "date-fns";
 export function AddSalaryForm({ employeeId }: { employeeId: string }) {
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [date, setDate] = useState<Date | null>(new Date());
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!date) return alert("Please select a date");
+        setError(null);
+        if (!date) {
+            setError("Please select a date.");
+            return;
+        }
         
         setLoading(true);
 
@@ -30,9 +35,8 @@ export function AddSalaryForm({ employeeId }: { employeeId: string }) {
             });
             setIsOpen(false);
             router.refresh(); 
-        } catch (error) {
-            console.error(error);
-            alert("Failed to add salary");
+        } catch (err: any) {
+            setError(err.message || "An unexpected error occurred.");
         } finally {
             setLoading(false);
         }
@@ -58,6 +62,13 @@ export function AddSalaryForm({ employeeId }: { employeeId: string }) {
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
+                        
+                        {error && (
+                            <div className="bg-red-50 text-red-600 p-4 border-b border-red-100 font-medium text-sm flex items-center gap-2">
+                                <X className="w-4 h-4 shrink-0" />
+                                {error}
+                            </div>
+                        )}
                         
                         <form onSubmit={handleSubmit} className="p-6 space-y-5">
                             <div>

@@ -50,6 +50,46 @@ export async function addSalary(data: { employee_id: string; amount: number; cur
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error("Failed to add salary");
+    if (!res.ok) {
+        let errorMsg = "Failed to add salary";
+        try {
+            const errorData = await res.json();
+            if (errorData.detail) {
+                if (typeof errorData.detail === 'string') {
+                    errorMsg = errorData.detail;
+                } else if (Array.isArray(errorData.detail)) {
+                    errorMsg = errorData.detail.map((e: any) => `${e.loc[e.loc.length - 1]}: ${e.msg}`).join(", ");
+                }
+            }
+        } catch (e) {
+            // ignore
+        }
+        throw new Error(errorMsg);
+    }
+    return res.json();
+}
+
+export async function createEmployee(data: Omit<Employee, "id" | "employee_number" | "status">): Promise<Employee> {
+    const res = await fetch(`${API_BASE_URL}/employees`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+        let errorMsg = "Failed to create employee";
+        try {
+            const errorData = await res.json();
+            if (errorData.detail) {
+                if (typeof errorData.detail === 'string') {
+                    errorMsg = errorData.detail;
+                } else if (Array.isArray(errorData.detail)) {
+                    errorMsg = errorData.detail.map((e: any) => `${e.loc[e.loc.length - 1]}: ${e.msg}`).join(", ");
+                }
+            }
+        } catch (e) {
+            // ignore
+        }
+        throw new Error(errorMsg);
+    }
     return res.json();
 }

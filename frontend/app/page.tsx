@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { getEmployees, Employee } from "@/lib/api";
-import { Plus, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { EmployeeTable } from "@/components/EmployeeTable";
+import { AddEmployeeForm } from "@/components/AddEmployeeForm";
 
 export default function Home() {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -57,10 +58,7 @@ export default function Home() {
               Manage your employees and their compensation globally.
             </p>
           </div>
-          <button className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md active:scale-[0.98]">
-            <Plus className="w-5 h-5" />
-            Add Employee
-          </button>
+          <AddEmployeeForm onSuccess={(newEmp) => setEmployees([newEmp, ...employees])} />
         </header>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">

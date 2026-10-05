@@ -16,11 +16,17 @@ class EmployeeRepository:
         return self.session.query(Employee).filter(Employee.id == employee_id).first()
 
     def get_all(self, skip: int = 0, limit: int = 100) -> list[Employee]:
-        return self.session.query(Employee).offset(skip).limit(limit).all()
+        return self.session.query(Employee).order_by(Employee.created_at.desc()).offset(skip).limit(limit).all()
 
     def generate_employee_number(self) -> str:
-        count = self.session.query(func.count(Employee.id)).scalar() or 0
-        return f"EMP-{(count + 1):05d}"
+        last_emp = self.session.query(Employee).order_by(Employee.employee_number.desc()).first()
+        if not last_emp or not last_emp.employee_number.startswith("EMP-"):
+            return "EMP-00001"
+        try:
+            num = int(last_emp.employee_number.split("-")[1])
+            return f"EMP-{num + 1:05d}"
+        except Exception:
+            return "EMP-00001"
 
     def create(self, obj_in: EmployeeCreate) -> Employee:
         db_obj = Employee(
