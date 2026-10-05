@@ -2,6 +2,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.employee import Employee
+from app.models.salary import Salary
 from app.schemas.employee import EmployeeCreate, EmployeeUpdate
 from app.schemas.enums import EmployeeStatus
 
@@ -43,16 +44,24 @@ class EmployeeRepository:
             hire_date=obj_in.hire_date
         )
         self.session.add(db_obj)
+        self.session.flush()
+
+        salary_obj = Salary(
+            employee_id=db_obj.id,
+            amount=obj_in.salary_amount,
+            currency=obj_in.salary_currency.upper(),
+            effective_date=obj_in.hire_date
+        )
+        self.session.add(salary_obj)
+
         self.session.commit()
         self.session.refresh(db_obj)
         return db_obj
     
     def update(self, db_obj: Employee, obj_in: EmployeeUpdate) -> Employee:
-        # Get only the fields that were actually provided in the request
         update_data = obj_in.model_dump(exclude_unset=True)
         
         for field, value in update_data.items():
-            # If the value is an Enum (like JobLevel), we need to extract its string value
             if hasattr(value, "value"):
                 setattr(db_obj, field, value.value)
             else:

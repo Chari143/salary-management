@@ -5,6 +5,7 @@ import { getEmployees, Employee } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { EmployeeTable } from "@/components/EmployeeTable";
 import { AddEmployeeForm } from "@/components/AddEmployeeForm";
+import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 
 export default function Home() {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -60,6 +61,8 @@ export default function Home() {
           </div>
           <AddEmployeeForm onSuccess={(newEmp) => setEmployees([newEmp, ...employees])} />
         </header>
+
+        <AnalyticsDashboard />
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
           <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

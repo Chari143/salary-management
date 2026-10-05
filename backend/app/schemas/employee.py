@@ -13,6 +13,8 @@ class EmployeeCreate(BaseModel):
     country: str = Field(..., min_length=2, max_length=2, description="US, IN")
     employment_type: EmploymentType
     hire_date: date
+    salary_amount: float = Field(..., gt=0)
+    salary_currency: str = Field(..., min_length=3, max_length=3)
 
 
 class EmployeeUpdate(BaseModel):

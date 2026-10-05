@@ -69,7 +69,12 @@ export async function addSalary(data: { employee_id: string; amount: number; cur
     return res.json();
 }
 
-export async function createEmployee(data: Omit<Employee, "id" | "employee_number" | "status">): Promise<Employee> {
+export type CreateEmployeeInput = Omit<Employee, "id" | "employee_number" | "status"> & {
+    salary_amount: number;
+    salary_currency: string;
+};
+
+export async function createEmployee(data: CreateEmployeeInput): Promise<Employee> {
     const res = await fetch(`${API_BASE_URL}/employees`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -91,5 +96,19 @@ export async function createEmployee(data: Omit<Employee, "id" | "employee_numbe
         }
         throw new Error(errorMsg);
     }
+    return res.json();
+}
+
+export interface AnalyticsOverview {
+    total_employees: number;
+    total_payroll_usd: number;
+    average_salary_usd: number;
+    department_averages: Array<{ department: string; average_salary_usd: number; headcount: number }>;
+    job_level_averages: Array<{ job_level: string; average_salary_usd: number; headcount: number }>;
+}
+
+export async function getAnalyticsOverview(): Promise<AnalyticsOverview> {
+    const res = await fetch(`${API_BASE_URL}/analytics/overview`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch analytics");
     return res.json();
 }

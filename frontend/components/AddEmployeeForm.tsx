@@ -21,7 +21,7 @@ export function AddEmployeeForm({ onSuccess }: { onSuccess: (emp: Employee) => v
             setError("Please select a hire date.");
             return;
         }
-        
+
         setLoading(true);
 
         const formData = new FormData(e.currentTarget);
@@ -36,6 +36,8 @@ export function AddEmployeeForm({ onSuccess }: { onSuccess: (emp: Employee) => v
                 country: formData.get("country") as string,
                 employment_type: formData.get("employment_type") as string,
                 hire_date: format(hireDate, "yyyy-MM-dd"),
+                salary_amount: parseFloat(formData.get("salary_amount") as string),
+                salary_currency: formData.get("salary_currency") as string,
             });
             setIsOpen(false);
             onSuccess(newEmp);
@@ -59,24 +61,24 @@ export function AddEmployeeForm({ onSuccess }: { onSuccess: (emp: Employee) => v
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        
+
                         <div className="flex justify-between items-center p-6 border-b border-slate-100">
                             <h3 className="text-xl font-extrabold text-slate-900">Add New Employee</h3>
                             <button type="button" onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors bg-slate-50 hover:bg-slate-100 p-2 rounded-full">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
-                        
+
                         {error && (
                             <div className="bg-red-50 text-red-600 p-4 border-b border-red-100 font-medium text-sm flex items-center gap-2">
                                 <X className="w-4 h-4 shrink-0" />
                                 {error}
                             </div>
                         )}
-                        
+
                         <form onSubmit={handleSubmit} className="p-6 space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                
+
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-700 mb-1">First Name</label>
                                     <input required type="text" name="first_name" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 font-medium" />
@@ -89,7 +91,7 @@ export function AddEmployeeForm({ onSuccess }: { onSuccess: (emp: Employee) => v
                                     <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
                                     <input required type="email" name="email" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 font-medium" />
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-700 mb-1">Department</label>
                                     <select required name="department_id" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 font-medium">
@@ -101,7 +103,7 @@ export function AddEmployeeForm({ onSuccess }: { onSuccess: (emp: Employee) => v
                                         <option value="dept-product">Product</option>
                                     </select>
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-700 mb-1">Country</label>
                                     <select required name="country" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 font-medium">
@@ -156,7 +158,28 @@ export function AddEmployeeForm({ onSuccess }: { onSuccess: (emp: Employee) => v
                                     </div>
                                 </div>
                             </div>
-                            
+
+                            <div className="pt-4 border-t border-slate-100">
+                                <h4 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider">Initial Salary</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="md:col-span-1">
+                                        <label className="block text-sm font-semibold text-slate-700 mb-1">Base Salary Amount</label>
+                                        <input required name="salary_amount" type="number" step="0.01" min="1" placeholder="e.g. 85000" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 font-medium placeholder-slate-400" />
+                                    </div>
+
+                                    <div className="md:col-span-1">
+                                        <label className="block text-sm font-semibold text-slate-700 mb-1">Currency</label>
+                                        <select required name="salary_currency" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 font-medium">
+                                            <option value="USD">USD - US Dollar</option>
+                                            <option value="EUR">EUR - Euro</option>
+                                            <option value="GBP">GBP - British Pound</option>
+                                            <option value="INR">INR - Indian Rupee</option>
+                                            <option value="SGD">SGD - Singapore Dollar</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="pt-4 flex gap-3">
                                 <button type="button" onClick={() => setIsOpen(false)} className="flex-1 px-4 py-2.5 text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
                                     Cancel
