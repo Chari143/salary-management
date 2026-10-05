@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from pydantic import BaseModel, Field, EmailStr
 from app.schemas.enums import JobLevel, EmploymentType, EmployeeStatus
+from typing import Optional
 
 class EmployeeCreate(BaseModel):
     first_name: str = Field(..., min_length=1, max_length=100)
@@ -12,6 +13,15 @@ class EmployeeCreate(BaseModel):
     country: str = Field(..., min_length=2, max_length=2, description="US, IN")
     employment_type: EmploymentType
     hire_date: date
+
+
+class EmployeeUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    department_id: Optional[str] = None
+    job_title: Optional[str] = None
+    job_level: Optional[JobLevel] = None
+    status: Optional[EmployeeStatus] = None # for soft delete
 
 class EmployeeResponse(BaseModel):
     id: str

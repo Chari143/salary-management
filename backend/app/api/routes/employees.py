@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.api.deps import get_db
-from app.schemas.employee import EmployeeCreate, EmployeeResponse
+from app.schemas.employee import EmployeeCreate, EmployeeResponse, EmployeeUpdate
 from app.repositories.employee_repo import EmployeeRepository
 from typing import List
 
@@ -47,3 +47,22 @@ def get_employee(
         )
         
     return employee
+
+
+
+@router.put("/{employee_id}", response_model=EmployeeResponse)
+def update_employee(
+    employee_id: str,
+    request: EmployeeUpdate,
+    db: Session = Depends(get_db)
+):
+    repo = EmployeeRepository(db)
+    employee = repo.get_by_id(employee_id)
+    
+    if not employee:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Employee not found"
+        )
+        
+    return repo.update(db_obj=employee, obj_in=request)
