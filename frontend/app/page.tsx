@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { getEmployees, Employee } from "@/lib/api";
 import { Loader2, Search } from "lucide-react";
 import { EmployeeTable } from "@/components/EmployeeTable";
@@ -13,14 +13,19 @@ export default function Home() {
   const [skip, setSkip] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentId, setDepartmentId] = useState("");
-  const limit = 10;
+  const [status, setStatus] = useState("ACTIVE");
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const observerTarget = useRef<HTMLDivElement>(null);
+  const limit = 20;
 
   useEffect(() => {
     async function loadInitial() {
       try {
-        const data = await getEmployees(0, limit, searchQuery, departmentId);
+        const data = await getEmployees(0, limit, searchQuery, departmentId, status);
         setEmployees(data);
         setSkip(0);
+        setHasMore(data.length === limit);
       } catch (error) {
         console.error(error);
       } finally {
@@ -33,18 +38,43 @@ export default function Home() {
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, departmentId]);
+  }, [searchQuery, departmentId, status]);
 
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
     const newSkip = skip + limit;
     try {
-      const data = await getEmployees(newSkip, limit, searchQuery, departmentId);
-      setEmployees([...employees, ...data]);
+      const data = await getEmployees(newSkip, limit, searchQuery, departmentId, status);
+      setEmployees(prev => [...prev, ...data]);
       setSkip(newSkip);
+      setHasMore(data.length === limit);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoadingMore(false);
     }
-  };
+  }, [skip, limit, searchQuery, departmentId, status, hasMore, loadingMore]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const target = observerTarget.current;
+    if (target) {
+      observer.observe(target);
+    }
+
+    return () => {
+      if (target) observer.unobserve(target);
+    };
+  }, [loadMore]);
 
   if (loading) {
     return (
@@ -77,6 +107,16 @@ export default function Home() {
             <h2 className="text-xl font-bold text-slate-800 shrink-0">Employee Roster</h2>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full sm:w-36 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium text-slate-900 bg-slate-50 cursor-pointer"
+              >
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+                <option value="ALL">All Status</option>
+              </select>
+
+              <select
                 value={departmentId}
                 onChange={(e) => setDepartmentId(e.target.value)}
                 className="w-full sm:w-48 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium text-slate-900 bg-slate-50 cursor-pointer"
@@ -105,15 +145,19 @@ export default function Home() {
             </div>
           </div>
 
-          <EmployeeTable employees={employees} />
+          <div className="max-h-[600px] overflow-y-auto relative">
+            <EmployeeTable employees={employees} />
 
-          <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex justify-center">
-            <button
-              onClick={loadMore}
-              className="text-sm font-semibold px-6 py-2.5 bg-white border border-slate-200 rounded-lg text-indigo-600 hover:text-indigo-700 hover:bg-slate-50 transition-colors shadow-sm"
+            <div 
+              ref={observerTarget}
+              className="p-6 flex justify-center items-center text-slate-400"
             >
-              View More Employees
-            </button>
+              {loadingMore ? (
+                <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
+              ) : !hasMore ? (
+                <span className="text-sm font-medium">No more employees to load</span>
+              ) : null}
+            </div>
           </div>
         </div>
 

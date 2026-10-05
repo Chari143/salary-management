@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+export const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
 
 export interface Employee {
     id: string;
@@ -25,8 +25,8 @@ export interface Salary {
 }
 
 
-export async function getEmployees(skip = 0, limit = 100, search = "", department_id = ""): Promise<Employee[]> {
-    let url = `${API_BASE_URL}/employees?skip=${skip}&limit=${limit}`;
+export async function getEmployees(skip = 0, limit = 100, search = "", department_id = "", status = "ACTIVE"): Promise<Employee[]> {
+    let url = `${API_BASE_URL}/employees?skip=${skip}&limit=${limit}&status=${status}`;
     if (search) {
         url += `&search=${encodeURIComponent(search)}`;
     }

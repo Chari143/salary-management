@@ -1,7 +1,9 @@
 import { getEmployee, getEmployeeSalaries } from "@/lib/api";
 import Link from "next/link";
-import { ArrowLeft, History, Plus } from "lucide-react";
+import { ArrowLeft, History } from "lucide-react";
 import { AddSalaryForm } from "@/components/AddSalaryForm";
+import { EditEmployeeForm } from "@/components/EditEmployeeForm";
+
 export default async function EmployeeDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
@@ -19,13 +21,23 @@ export default async function EmployeeDetailsPage({ params }: { params: Promise<
                     Go Back
                 </Link>
 
-                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-6">
-                    <div className="w-20 h-20 rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-2xl shadow-md">
-                        {employee.first_name[0]}{employee.last_name[0]}
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="flex items-center gap-6">
+                        <div className="w-20 h-20 shrink-0 rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-2xl shadow-md">
+                            {employee.first_name[0]}{employee.last_name[0]}
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-3">
+                                <h1 className="text-3xl font-extrabold text-slate-900">{employee.first_name} {employee.last_name}</h1>
+                                {employee.status === "INACTIVE" && (
+                                    <span className="px-2.5 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">INACTIVE</span>
+                                )}
+                            </div>
+                            <p className="text-lg text-slate-500 font-medium">{employee.job_title} • {employee.department_id.replace('dept-', '').toUpperCase()}</p>
+                        </div>
                     </div>
                     <div>
-                        <h1 className="text-3xl font-extrabold text-slate-900">{employee.first_name} {employee.last_name}</h1>
-                        <p className="text-lg text-slate-500 font-medium">{employee.job_title} • {employee.department_id.replace('dept-', '').toUpperCase()}</p>
+                        <EditEmployeeForm employee={employee} />
                     </div>
                 </div>
 

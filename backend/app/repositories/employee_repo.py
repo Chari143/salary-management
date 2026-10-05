@@ -16,8 +16,11 @@ class EmployeeRepository:
     def get_by_id(self, employee_id: str) -> Optional[Employee]:
         return self.session.query(Employee).filter(Employee.id == employee_id).first()
 
-    def get_all(self, skip: int = 0, limit: int = 100, search: str = None, department_id: str = None) -> list[Employee]:
-        query = self.session.query(Employee).filter(Employee.status == EmployeeStatus.ACTIVE.value)
+    def get_all(self, skip: int = 0, limit: int = 100, search: str = None, department_id: str = None, status: str = "ACTIVE") -> list[Employee]:
+        query = self.session.query(Employee)
+        
+        if status != "ALL":
+            query = query.filter(Employee.status == status)
         
         if department_id:
             query = query.filter(Employee.department_id == department_id)
