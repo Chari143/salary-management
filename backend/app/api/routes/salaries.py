@@ -13,7 +13,6 @@ def add_salary(
     request: SalaryCreate,
     db: Session = Depends(get_db)
 ):
-    # Verify employee exists first
     emp_repo = EmployeeRepository(db)
     if not emp_repo.get_by_id(request.employee_id):
         raise HTTPException(
@@ -29,7 +28,6 @@ def get_employee_salary_history(
     employee_id: str,
     db: Session = Depends(get_db)
 ):
-    # Verify employee exists
     emp_repo = EmployeeRepository(db)
     if not emp_repo.get_by_id(employee_id):
         raise HTTPException(
